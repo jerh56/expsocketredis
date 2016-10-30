@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+
+    </head>
+    <body>
+        <div id="contenedor">
+            <header>
+            </header>
+
+            <section id="login">
+                <div class="login1">
+                    <p class="encabezado" id="cabeza">¡Qué gusto verte de nuevo!</p>
+                    <p class="texto_plano">ingresa tus datos para iniciar</p>
+                </div>
+            </section>
+            <h1><%= message %> </h1>
+            <section id="login">
+                <form action='/signin' method='POST'>
+                    <ul>
+                        <li>
+                            <label>Correo Electrónico</label>
+                            <input type="email" name="email" required>
+                        </li>
+                        <li>
+                            <label>Contraseña</label>
+                            <input type="password" name="password" required>
+                        </li>
+                    </ul>
+
+                    <div>
+                        <input type="submit" value="Aceptar">
+                    </div>
+                </form>
+            </section>
+        </div>
+    <footer>
+    </footer>
+    </body>
+</html>

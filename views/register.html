@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        
+        <script type="text/javascript">
+            function check(input,input2,message) {
+                if (input.value != document.getElementById(input2).value) {
+                    input.setCustomValidity(message);
+                } else {
+                    // input is valid -- reset the error message
+                    input.setCustomValidity('');
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div id="contenedor">
+            <section id="contenedor1">
+                <form id="contactForm1"  action="/signup" method="post" name="registro_form">
+                    <input type="text" name="username" placeholder="Nombre" required>
+                    <br>
+                    <input type="email" name="email" placeholder="Correo Electrónico" required>
+                    <br>
+                    <input type="password" name="password" id="password1"  placeholder="Contraseña" required>
+                    <input type="password" name="confirmpass"  id="confirmpass" oninput="check(this, 'password1', 'La contraseña no coincide')" placeholder="Confirmar Contraseña" required>
+                    <br>
+                    <br>
+                    <input class="buttonreg" type="submit" value="Registro">
+                </form> 
+            </section>
+        </div>            
+    </body>
+</html>
