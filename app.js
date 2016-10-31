@@ -238,7 +238,7 @@ passport.use('signup', new LocalStrategy({
               throw err;  
             }
             console.log('Se registró correctamente el usuario');
-            return done(null, newUser, {message:'Se registró correctamente el usuario'});
+            return done(null, newUser, req.flash('message', 'Se registró correctamente el usuario.'));
             
             // var mailOptions = {
             //     from: '"Welcome" <welcome@mail-imgnpro.com>', // sender address

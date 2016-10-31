@@ -34,8 +34,10 @@ router.get('/', function(req, res, next) {
     function(req, res){
         //var msjres = req.flash('success');
         //res.setHeader('Content-Type', 'application/json');
+        var msjres = req.flash('message');
+        
         //res.send(JSON.stringify({ error: 0, message: msjres[0]}));
-		res.render('principal', {message: req.flash('success'), user: req.user});
+		res.render('principal', {message: msjres[0], user: req.user});
 
   });
 
