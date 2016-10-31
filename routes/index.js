@@ -42,16 +42,17 @@ router.get('/', function(req, res, next) {
 
   // Si sucede un error al registrar un usuario se ejecuta esta ruta
   router.get('/signup_error', function(req, res) {
-    var msjres = req.flash('error');
-    if (msjres[0]!= undefined){
+     var msjres = req.flash('message');
+    // if (msjres[0]!= undefined){
          //console.log(msjres[0]);
          //res.setHeader('Content-Type', 'application/json');
          //res.send(JSON.stringify({ error: 1, message: msjres[0]}));
-    	res.render('principal', {message: req.flash('error'), user: req.user});
-    }
-    else {
-         res.redirect('/');
-    }
+        console.log(req.flash('failure'));
+    	res.render('principal', {message: msjres[0], user: req.user});
+    // }
+    // else {
+    //      res.redirect('/');
+    // }
   });
 
 

@@ -204,16 +204,21 @@ passport.use('signup', new LocalStrategy({
         //var v_userlongname = req.param('userlongname');
         if (user){ //  && v_userlongname !== 'demoimgnpro' ) {
           console.log('User already exists');
-          return done(null, false,{message:'El correo ya existe'});
+          return done(null, false,req.flash('message', 'Usuario ya existe.'));
         } 
         else {
           // if there is no user with that email
           // create the user
           var newUser = new User();
           // set the user's local credentials
-          newUser.username = req.params.username;
+
+          console.log(req.params);
+          console.log(req.query);
+          console.log(req.body);
+          newUser.username = req.body.userlongname;
           newUser.password = createHash(password);
           newUser.email = username;
+          console.log(newUser);
           //newUser.accept_terms = req.param('accept_terms');
           //newUser.usertype = 'user';
           // if(config.register.usermustactivate == true){
