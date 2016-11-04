@@ -21,7 +21,7 @@ var ejs = require('ejs'); // Render
 
 // Mongoose
 var dbConfig = require('./models/db.js');
-var mongoose = require('mongoose');
+//var mongoose = require('mongoose');
 var User = require('./models/user.js');
 
 // Mongoose
