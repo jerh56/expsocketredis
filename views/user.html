@@ -1,0 +1,95 @@
+
+<link rel="stylesheet" type="text/css" href="../stylesheets/style.css">
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script>
+  var socket = io.connect('/',{'forceNew': false });
+  $( document ).ready(function() {
+    console.log( "ready!" );
+	
+    var localusername ='';
+
+	// on connection to server, ask for user's name with an anonymous callback
+	socket.on('connect', function(){
+		// call the server-side function 'adduser' and send one parameter (value of prompt)
+		localusername = prompt("Cual es tu nombre de usuario?");
+		socket.emit('adduser', localusername);
+		socket.localusername = localusername;
+	});
+
+    socket.on('reconnecting', function(){
+		console.log("Reconectando");
+	});
+
+
+	// listener, whenever the server emits 'updatechat', this updates the chat body
+	socket.on('updatechat', function (username, data) {
+
+        if (username === localusername){
+		   $('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
+	    }
+	    else{
+	    	$('#conversation').append('<b id="msjuser">'+ '>>' + username + ':</b> ' + data + '<br>');
+	    } 
+		//Getting the element's new height now
+        var sHeight = $('#conversation')[0].scrollHeight;
+        //Scrolling the element to the sHeight
+        $('#box_conversation').scrollTop(sHeight);
+
+        console.log(sHeight);
+
+	});
+
+   
+	// listener, whenever the server emits 'updaterooms', this updates the room the client is in
+	socket.on('updaterooms', function(rooms, current_room) {
+		$('#agents').empty();
+		$.each(rooms, function(key, value) {
+		   $('#agents').append('<div>' + value.nombre + '</div>');
+			
+		});
+	});
+
+	function switchRoom(room){
+		socket.emit('switchRoom', room);
+	}
+
+	// on load of page
+	$(function(){
+		$('#data').focus(); // al cargar por primera vez manda el enfoque al textbox data 
+		// when the client clicks SEND
+		$('#datasend').click( function() {
+			var message = $('#data').val();
+			$('#data').val('');
+			$('#data').focus(); // manda el enfoque al input
+			// tell server to execute 'sendchat' and send along one parameter
+
+			socket.emit('sendchat', message);
+
+		});
+
+		// when the client hits ENTER on their keyboard
+		$('#data').keyup(function(e) {
+			if(e.which == 13) {
+				$(this).blur();
+				$('#datasend').focus().click();
+			}
+			else{
+				socket.emit('typing','fgdgd');
+			}
+		});
+	});
+  });
+</script>
+<div style="float:left;width:100px;border-right:1px solid black;height:300px;padding:10px;overflow:auto;">
+	<b>AGENTES</b>
+	<div id="agents"></div>
+</div>
+<div id ="box_conversation" style="float:left;width:600px;height:250px;overflow:auto;padding:10px;">
+	<p id="msj_type"></p>
+	<div id="conversation"></div>
+</div>
+<div style="float:bottom">
+	<input id="data" style="width:600px;" />
+	<input type="button" id="datasend" value="enviar" />
+</div>
