@@ -12,7 +12,8 @@
 				// on connection to server, ask for user's name with an anonymous callback
 				socket.on('connect', function(){
 					// call the server-side function 'adduser' and send one parameter (value of prompt)
-					localusername = prompt("Cual es tu nombre de usuario?");
+					//localusername = prompt("Cual es tu nombre de usuario?");
+					localusername = '<%= username %>'
 					socket.emit('adduser', localusername);
 					socket.localusername = localusername;
 				});
@@ -22,10 +23,12 @@
 				// listener, whenever the server emits 'updatechat', this updates the chat body
 				socket.on('updatechat', function (username, data) {
 					if (username === localusername){
-					   $('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
+					   $('#conversation').append('<p class="triangle-isosceles"> <b>' + username + ':</b> ' + data + '</p>');				
+					   //$('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
 				    }
 				    else{
-				    	$('#conversation').append('<b id="msjuser">'+ '>>' + username + ':</b> ' + data + '<br>');
+				    	$('#conversation').append('<p class="triangle-isosceles top"> <b>' + '>>' + username + ':</b> ' + data + '</p>');
+				    	//$('#conversation').append('<b id="msjuser">'+ '>>' + username + ':</b> ' + data + '<br>');
 				    } 
 					//Getting the element's new height now
 				    var sHeight = $('#conversation')[0].scrollHeight;

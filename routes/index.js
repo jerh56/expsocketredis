@@ -8,9 +8,10 @@ var passport = require('passport');
 	});
 
 	
-	router.get('/user', function (req, res) {
+	router.get('/user', require('connect-ensure-login').ensureLoggedIn('/login'), function (req, res) {
 	  //res.sendFile(__dirname + '/indexUser.html');
-	  res.render('user');
+	  console.log(req.user.username);
+	  res.render('user', { username: req.user.username });
 	});
 
 	router.get('/agent', function (req, res) {
@@ -74,19 +75,10 @@ var passport = require('passport');
 // PASSPORT
 
 
-	// SOCKET.IO
-	router.get('/chat',
-		require('connect-ensure-login').ensureLoggedIn('/login'),function(req, res){
-		console.log(req.user);
-	    res.render('chat', {message: req.flash('message'), user: req.user});
-	});
-	// SOCKEY.IO
-
-
 
 	// PASSPORT
 	router.post('/signin', passport.authenticate('login', {
-		successRedirect: '/principal',
+		successRedirect: '/user',
 		failureRedirect: '/login',
 		failureFlash : true,
 		successFlash : true 
