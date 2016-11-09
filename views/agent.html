@@ -14,7 +14,8 @@
 			// on connection to server, ask for user's name with an anonymous callback
 			socket.on('connect', function(){
 			// call the server-side function 'adduser' and send one parameter (value of prompt)
-		    agentname = prompt("Cual es tu nombre de Agente?")
+		    //agentname = prompt("Cual es tu nombre de Agente?")
+		    	  agentname = '<%= agentname %>';
 				  socket.emit('addagent', agentname);
 				  socket.agentname = agentname;
 			});

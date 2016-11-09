@@ -10,13 +10,13 @@ var passport = require('passport');
 	
 	router.get('/user', require('connect-ensure-login').ensureLoggedIn('/login'), function (req, res) {
 	  //res.sendFile(__dirname + '/indexUser.html');
-	  console.log(req.user.username);
+	  //console.log(req.user.username);
 	  res.render('user', { username: req.user.username });
 	});
 
-	router.get('/agent', function (req, res) {
+	router.get('/agent', require('connect-ensure-login').ensureLoggedIn('/login') ,function (req, res) {
 	  //res.sendFile(__dirname + '/indexAgent.html');
-	  res.render('agent');
+	  res.render('agent', { agentname: req.user.username });
 	});
 
 
@@ -27,6 +27,15 @@ var passport = require('passport');
 		//res.render('login', {message: 'dfjhdjhsjd'});
 		var msjres = req.flash('message');
 		res.render('login', {message: msjres[0]});
+
+	});
+
+	router.get('/login2', function(req, res) {
+		//console.log(req.flash('message'));
+
+		//res.render('login', {message: 'dfjhdjhsjd'});
+		var msjres = req.flash('message');
+		res.render('login2', {message: msjres[0]});
 
 	});
 
@@ -89,6 +98,14 @@ var passport = require('passport');
 	router.post('/signin', passport.authenticate('login', {
 		successRedirect: '/user',
 		failureRedirect: '/login',
+		failureFlash : true,
+		successFlash : true 
+	}));
+
+// PASSPORT
+	router.post('/signin2', passport.authenticate('login', {
+		successRedirect: '/agent',
+		failureRedirect: '/login2',
 		failureFlash : true,
 		successFlash : true 
 	}));
