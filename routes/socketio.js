@@ -3,6 +3,9 @@ module.exports = function(io){
 var app = require('express');
 var uuid = require('uuid4');
 var router = app.Router();
+var Usernames = require('../models/usernames.js');
+var Agentnames = require('../models/agentnames.js');
+var Userlist = require('../models/userlist.js');
 
 // usernames which are currently connected to the chat
 var usernames = new Array();
@@ -19,7 +22,7 @@ setInterval(function(){
   var agentroom = '0';
   var posRoom = 0;
   if (userlist.length > 0){
-    console.log(userlist);
+    //console.log(userlist);
     for (var agentname in agentnames){
         //console.log(agentnames[agentname].nombre);
        if (agentnames[agentname].cantidad < 3 ){
@@ -29,17 +32,31 @@ setInterval(function(){
          agentroom = agentnames[agentname].idroom;
          var waitforagent = false;
          var username ='';
-         for (var posusername in userlist){
-            console.log(userlist[posusername].nombre);
-            console.log(userlist[posusername].idroom);
-            username = userlist[posusername].nombre;
-            currentroom = userlist[posusername].idroom;
-            io.sockets.in(currentroom).emit('updatechat', 'MENSAJERO RTC', 'Hay agente disponible ');
-            io.sockets.in(agentroom).emit('newuser', 'MENSAJERO RTC',username, currentroom, posRoom);
-            io.sockets.in(currentroom).emit('updatechat', 'MENSAJERO RTC','Te esta atendiendo ' + agentnames[agentname].nombre, posRoom,currentroom);
-            userlist.splice(posusername,1);
-            break;
-         }    
+         //for (var posusername in userlist){
+            Userlist.findOne({},function(err,doc){
+              if(err){
+
+              }
+              else{
+                console.log(doc);
+                console.log(userlist[posusername].nombre);
+                console.log(userlist[posusername].idroom);
+                //username = userlist[posusername].nombre;
+                //currentroom = userlist[posusername].idroom;
+
+                username = doc.nombre;
+                currentroom = doc.idroom;
+                io.sockets.in(currentroom).emit('updatechat', 'MENSAJERO RTC', 'Hay agente disponible ');
+                io.sockets.in(agentroom).emit('newuser', 'MENSAJERO RTC',username, currentroom, posRoom);
+                io.sockets.in(currentroom).emit('updatechat', 'MENSAJERO RTC','Te esta atendiendo ' + agentnames[agentname].nombre, posRoom,currentroom);
+                userlist.splice(posusername,1);
+              }
+
+            });
+
+            
+            //break;
+         //}    
          break;
        }
     }
@@ -83,6 +100,15 @@ io.sockets.on('connection', function (socket){
         // Sino encontro agente disponible se manda a la lista de espera.
         if (waitforagent){
               //Se agrega a la lista de usuario para que 
+          
+          newUserlist = new Userlist();
+          newUserlist.nombre = username;
+          newUserlist.idroom = currentroom;
+          newUserlist.save(function(err){
+              //if (!err) 
+                console.log('Se tiene un usuario en espera');
+          });
+
           if (userlist.length == 0){
               userlist[0] = ({"nombre":username, "idroom":currentroom});
               // add the client's username to the wait list
@@ -95,6 +121,15 @@ io.sockets.on('connection', function (socket){
           socket.isuser = true;
           socket.room = currentroom;
           // add the client's username to the global list
+          
+          newUsername = new Usernames();
+          newUsername.nombre = username;
+          newUsername.socketid = socket.id;
+          newUsername.save(function(err){
+              //if (!err) 
+                console.log('Se conectó un usuario');
+          });
+
           if (usernames.length == 0){
               usernames[0] = ({"nombre":username, "socketid":socket.id});
               // add the client's username to the wait list
@@ -114,8 +149,16 @@ io.sockets.on('connection', function (socket){
           socket.isuser = true;
           socket.room = currentroom;
           // add the client's username to the global list
+          
+          newUsername = new Usernames();
+          newUsername.nombre = username;
+          newUsername.socketid = socket.id;
+          newUsername.save(function(err){
+              //if (!err) 
+                console.log('Se conectó un usuario');
+          });
           if (usernames.length == 0){
-                   usernames[0] = ({"nombre":username, "socketid":socket.id});
+              usernames[0] = ({"nombre":username, "socketid":socket.id});
                    // add the client's username to the wait list
           }
           else{
@@ -153,6 +196,13 @@ io.sockets.on('connection', function (socket){
       currentroom = idroom;
       socket.room = idroom;
       //cantidad = 0 esta cantidad
+      newAgentname = new Agentnames();
+      newAgentname.nombre = agentname;
+      newAgentname.idroom = idroom;
+      newAgentname.save(function(err){
+          if (!err) console.log('Se conectó un agente');
+      });
+
       if (agentnames.length == 0){
         agentnames[0] = ({"nombre":agentname, "cantidad":0, "idroom":idroom});
         // add the client's username to the global list
