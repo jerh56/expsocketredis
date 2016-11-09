@@ -22,17 +22,26 @@ var passport = require('passport');
 
 	// PASSPORT
 	router.get('/login', function(req, res) {
-	//console.log(req.flash('message'));
+		//console.log(req.flash('message'));
 
-	//res.render('login', {message: 'dfjhdjhsjd'});
-	var msjres = req.flash('message');
-	res.render('login', {message: msjres[0]});
+		//res.render('login', {message: 'dfjhdjhsjd'});
+		var msjres = req.flash('message');
+		res.render('login', {message: msjres[0]});
 
+	});
+
+	router.get('/logout', function(req, res){
+		req.logOut();
+		req.session.destroy();
+		res.clearCookie('connect.sid');
+		setTimeout(function() {
+			res.redirect("/login");
+		}, 1000);
 	});
 
 	router.get('/register', function(req, res) {
 	// Display the Login page with any flash message, if any
-	res.render('register', {message: req.flash('message')});
+		res.render('register', {message: req.flash('message')});
 	});
 
 	router.get('/principal',
@@ -91,5 +100,8 @@ var passport = require('passport');
 		successFlash : true 
 	}));
 // PASSPORT
+
+
+
 
 module.exports = router;
