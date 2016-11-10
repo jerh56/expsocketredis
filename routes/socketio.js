@@ -6,6 +6,8 @@ var router = app.Router();
 var Usernames = require('../models/usernames.js');
 var Agentnames = require('../models/agentnames.js');
 var Userlist = require('../models/userlist.js');
+var Msglist = require('../models/msglist.js');
+
 
 // usernames which are currently connected to the chat
 var usernames = new Array();
@@ -20,7 +22,7 @@ var currentroom ="";
 setInterval(function(){
   //console.log('test');
   var agentroom = '0';
-  var posRoom = 0;
+  var posRoom = '';
   if (userlist.length > 0){
     //console.log(userlist);
     for (var agentname in agentnames){
@@ -32,7 +34,7 @@ setInterval(function(){
          agentroom = agentnames[agentname].idroom;
          var waitforagent = false;
          var username ='';
-         //for (var posusername in userlist){
+         for (var posusername in userlist){
             Userlist.findOne({},function(err,doc){
               if(err){
 
@@ -41,22 +43,31 @@ setInterval(function(){
                 console.log(doc);
                 console.log(userlist[posusername].nombre);
                 console.log(userlist[posusername].idroom);
-                //username = userlist[posusername].nombre;
-                //currentroom = userlist[posusername].idroom;
+                username = userlist[posusername].nombre;
+                currentroom = userlist[posusername].idroom;
 
-                username = doc.nombre;
-                currentroom = doc.idroom;
+                //username = doc.nombre;
+                //currentroom = doc.idroom;
                 io.sockets.in(currentroom).emit('updatechat', 'MENSAJERO RTC', 'Hay agente disponible ');
                 io.sockets.in(agentroom).emit('newuser', 'MENSAJERO RTC',username, currentroom, posRoom);
                 io.sockets.in(currentroom).emit('updatechat', 'MENSAJERO RTC','Te esta atendiendo ' + agentnames[agentname].nombre, posRoom,currentroom);
                 userlist.splice(posusername,1);
+
+                doc.remove({ _id: doc._id }, function(err) {
+                    if (err) {
+                        console.log('Error')
+                    }
+                    else {
+                        console.log('Se eliminó correctamente ')
+                    }
+                });
               }
 
             });
 
             
-            //break;
-         //}    
+            break;
+         }    
          break;
        }
     }
@@ -249,6 +260,23 @@ io.sockets.on('connection', function (socket){
     socket.on('sendchat', function (data) {
       // we tell the client to execute 'updatechat' with 2 parameters
       io.sockets.in(socket.room).emit('updatechat', socket.username, data,socket.posRoom, socket.room);
+      var newMsglist = new Msglist();
+      newMsglist.username = socket.username;
+      newMsglist.userid = socket.request.user._id;
+      newMsglist.posroom = socket.posRoom;
+      newMsglist.room = socket.room;
+      newMsglist.usertype = 'user';
+      newMsglist.message = data;
+      newMsglist.date_msg = Date.now();
+      newMsglist.save(function(err){
+        if (err){
+          console.log('error');
+        }
+        else
+        {
+          console.log('se guardó un mesaje de usuario')
+        }
+      });
       console.log(socket.username);
       console.log(socket.room);
     });
@@ -256,6 +284,24 @@ io.sockets.on('connection', function (socket){
     // Cuando el agente emite un mensaje sendchatagent
     socket.on('sendchatagent', function (data,roomname,pos){
       io.sockets.in(roomname).emit('updatechat', socket.agentname, data,pos);
+      var newMsglist = new Msglist();
+      newMsglist.username = socket.agentname;
+      newMsglist.userid = socket.request.user._id;
+      newMsglist.posroom = pos;
+      newMsglist.room = roomname;
+      newMsglist.usertype = 'agent';
+      newMsglist.message = data;
+      newMsglist.date_msg = Date.now();
+      newMsglist.save(function(err){
+        if (err){
+          console.log('error');
+        }
+        else
+        {
+          console.log('se guardó un mesaje de usuario')
+        }
+      });
+
       console.log(socket.room);
       console.log(socket.agentname);
       console.log(data);
