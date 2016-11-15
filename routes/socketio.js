@@ -11,7 +11,7 @@ var Msglist = require('../models/msglist.js');
 
 // usernames which are currently connected to the chat
 var usernames = new Array();
-var userlist = new Array();
+//var userlist = new Array();
 var agentnames = new Array();
 //var agentnames = {};
 var currentroom ="";
@@ -23,55 +23,57 @@ setInterval(function(){
   //console.log('test');
   var agentroom = '0';
   var posRoom = '';
-  if (userlist.length > 0){
-    //console.log(userlist);
-    for (var agentname in agentnames){
-        //console.log(agentnames[agentname].nombre);
-       if (agentnames[agentname].cantidad < 3 ){
-         agentnames[agentname].cantidad = agentnames[agentname].cantidad + 1;
-         console.log(agentnames[agentname].cantidad);
-         posRoom = ("0" + agentnames[agentname].cantidad).slice(-2);
-         agentroom = agentnames[agentname].idroom;
-         var waitforagent = false;
-         var username ='';
-         for (var posusername in userlist){
-            Userlist.findOne({},function(err,doc){
-              if(err){
+  Userlist.count({},function(err,nCount){
+      //console.log('Conteo: ' + nCount);
+      if ( nCount > 0 ){
+            //console.log(userlist);
+        for (var agentname in agentnames){
+            //console.log(agentnames[agentname].nombre);
+           if (agentnames[agentname].cantidad < 3 ){
+             agentnames[agentname].cantidad = agentnames[agentname].cantidad + 1;
+             console.log(agentnames[agentname].cantidad);
+             posRoom = ("0" + agentnames[agentname].cantidad).slice(-2);
+             agentroom = agentnames[agentname].idroom;
+             var waitforagent = false;
+             var username ='';
+             //for (var posusername in userlist){
+                Userlist.findOne({},function(err,doc){
+                  if(err){
+                    console.log(err);
+                  }
+                  else{
+                    console.log(doc);
+                    //console.log(userlist[posusername].nombre);
+                    //console.log(userlist[posusername].idroom);
+                    console.log(doc.nombre);
+                    console.log(doc.idroom);
+                    // username = userlist[posusername].nombre;
+                    // currentroom = userlist[posusername].idroom;
 
-              }
-              else{
-                console.log(doc);
-                console.log(userlist[posusername].nombre);
-                console.log(userlist[posusername].idroom);
-                username = userlist[posusername].nombre;
-                currentroom = userlist[posusername].idroom;
+                    username = doc.nombre;
+                    currentroom = doc.idroom;
+                    io.sockets.in(currentroom).emit('updatechat', 'MENSAJERO RTC', 'Hay agente disponible ');
+                    io.sockets.in(agentroom).emit('newuser', 'MENSAJERO RTC',username, currentroom, posRoom);
+                    io.sockets.in(currentroom).emit('updatechat', 'MENSAJERO RTC','Te esta atendiendo ' + agentnames[agentname].nombre, posRoom,currentroom);
+                    //userlist.splice(posusername,1);
 
-                //username = doc.nombre;
-                //currentroom = doc.idroom;
-                io.sockets.in(currentroom).emit('updatechat', 'MENSAJERO RTC', 'Hay agente disponible ');
-                io.sockets.in(agentroom).emit('newuser', 'MENSAJERO RTC',username, currentroom, posRoom);
-                io.sockets.in(currentroom).emit('updatechat', 'MENSAJERO RTC','Te esta atendiendo ' + agentnames[agentname].nombre, posRoom,currentroom);
-                userlist.splice(posusername,1);
-
-                doc.remove({ _id: doc._id }, function(err) {
-                    if (err) {
-                        console.log('Error')
-                    }
-                    else {
-                        console.log('Se eliminó correctamente ')
-                    }
+                    doc.remove({ _id: doc._id }, function(err) {
+                        if (err) {
+                            console.log('Error')
+                        }
+                        else {
+                            console.log('Se eliminó correctamente ')
+                        }
+                    });
+                  }
                 });
-              }
-
-            });
-
-            
-            break;
-         }    
-         break;
-       }
-    }
- }   
+               // break;
+             //}    
+             break;
+           }
+        }
+      }
+  });
 }, 3000); 
 
 io.sockets.on('connection', function (socket){
@@ -120,15 +122,15 @@ io.sockets.on('connection', function (socket){
                 console.log('Se tiene un usuario en espera');
           });
 
-          if (userlist.length == 0){
-              userlist[0] = ({"nombre":username, "idroom":currentroom});
-              // add the client's username to the wait list
-          }
-          else{
-              userlist.push ({"nombre":username, "idroom":currentroom});
-              // add the client's username to the wait list
-              console.log(userlist);
-          }
+          // if (userlist.length == 0){
+          //     userlist[0] = ({"nombre":username, "idroom":currentroom});
+          //     // add the client's username to the wait list
+          // }
+          // else{
+          //     userlist.push ({"nombre":username, "idroom":currentroom});
+          //     // add the client's username to the wait list
+          //     console.log(userlist);
+          // }
           socket.isuser = true;
           socket.room = currentroom;
           // add the client's username to the global list
@@ -324,24 +326,40 @@ io.sockets.on('connection', function (socket){
         if (socket.isuser === true){
           // remove the username from global usernames list
           //delete usernames[socket.username];
-          for (var posusername in usernames){
-             if (usernames[posusername].socketid === socket.id ){
-               console.log("se elimino el usuario " + usernames[posusername].nombre)
-               console.log(usernames);
-               usernames.splice(posusername,1);
-               console.log(usernames);
-               break;
+          Usernames.remove({ socketid: socket.id }, function(err) {
+              if (err) {
+                  console.log('Error')
               }
-          }  
+              else {
+                  Usernames.find({},function(err,rUsernames){
+                    if (err){
+                      console.log(err);
+                    }
+                    else{
+                      console.log(rUsernames);
+                      io.sockets.emit('updateusers', rUsernames);
+                      // echo globally that this client has left
+                      // preguntar si es usuario para avisar al agente que se desconecto
+                      io.sockets.in(socket.room).emit('updatechat', 'MENSAJERO RTC', "Se desconecto el usuario " + socket.username, socket.posRoom,socket.room);
+                      console.log("Se desconecto el usuario " + socket.username)
+                      socket.broadcast.emit('updatechat', 'MENSAJERO RTC', socket.username + ' se ha desconectado');
+                      socket.leave(socket.room);
+                    }
+                  });  
+              }
+          });
+
+          // for (var posusername in usernames){
+          //    if (usernames[posusername].socketid === socket.id ){
+          //      console.log("se elimino el usuario " + usernames[posusername].nombre)
+          //      console.log(usernames);
+          //      usernames.splice(posusername,1);
+          //      console.log(usernames);
+          //      break;
+          //     }
+          // }  
           // update list of users in chat, client-side
-          io.sockets.emit('updateusers', usernames);
-          // echo globally that this client has left
-          // preguntar si es usuario para avisar al agente que se desconecto
-          io.sockets.in(socket.room).emit('updatechat', 'MENSAJERO RTC', "Se desconecto el usuario " + socket.username, socket.posRoom,socket.room);
-          console.log("Se desconecto el usuario " + socket.username)
-          socket.broadcast.emit('updatechat', 'MENSAJERO RTC', socket.username + ' se ha desconectado');
-          socket.leave(socket.room);
-          console.log('Se desconecto el usuario: ' + socket.username);
+          
        }
        else{
           if (socket.isuser === false){
