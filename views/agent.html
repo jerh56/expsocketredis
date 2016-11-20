@@ -9,7 +9,45 @@
 		<script>
 		// Se declara la variable socket fuera de la funcion ready para que su ambito sea global
 		var socket = io.connect('/',{'forceNew': true });
-		$( document ).ready(function() {
+		
+		</script>
+	</head>  
+	<body>
+		<div id = "divbody">
+			<div style="float:left;width:100px;border-right:1px solid black;height:100px;padding:10px;overflow:auto;">
+				<b>AGENTES</b>
+				<div id="agents"></div>
+			</div>
+			<div id ="box_conversation" style="float:left;width:600px;height:100px;overflow:auto;padding:10px;">
+				<div id="conversation"></div>
+			</div>
+			<div style="float:bottom">
+				<input id="data" style="width:600px;" />
+				<input type="button" id="datasend" value="enviar" />
+			</div>
+		</div>
+		
+		<div class="span6">
+			<div class="tabbable tabs-left">
+				<ul id="tabsmsj" class="nav nav-tabs">
+				</ul>
+				<div id="divsmsj" class="tab-content">
+				</div>
+			</div>
+		</div>
+		
+		<script src="../stylesheets/bootstrap.min.js"></script>
+		<script src="../stylesheets/ace-elements.min.js"></script>
+		<script src="../stylesheets/ace.min.js"></script>
+		<script src="../stylesheets/spin.min.js"></script>
+		<script src="../stylesheets/jquery.gritter.min.js"></script>
+		<script src="../stylesheets/jquery.easy-pie-chart.min.js"></script>
+		<script src="../stylesheets/bootbox.min.js"></script>
+		<script src="../stylesheets/jquery.ui.touch-punch.min.js"></script>
+		<script src="../stylesheets/jquery-ui-1.10.3.custom.min.js"></script>
+		<script src="../stylesheets/jquery-2.0.3.min.js"></script>
+		<script>
+			$( document ).ready(function() {
 		    console.log( "ready!" );
 		    // la URL que se le pasa io.connect es / para que tome la ip local del cliente
 		    var agentname ='';
@@ -130,41 +168,5 @@
 			});
 		 });
 		</script>
-	</head>  
-	<body>
-		<div id = "divbody">
-			<div style="float:left;width:100px;border-right:1px solid black;height:100px;padding:10px;overflow:auto;">
-				<b>AGENTES</b>
-				<div id="agents"></div>
-			</div>
-			<div id ="box_conversation" style="float:left;width:600px;height:100px;overflow:auto;padding:10px;">
-				<div id="conversation"></div>
-			</div>
-			<div style="float:bottom">
-				<input id="data" style="width:600px;" />
-				<input type="button" id="datasend" value="enviar" />
-			</div>
-		</div>
-		
-		<div class="span6">
-			<div class="tabbable tabs-left">
-				<ul id="tabsmsj" class="nav nav-tabs">
-				</ul>
-				<div id="divsmsj" class="tab-content">
-				</div>
-			</div>
-		</div>
-		
-		<script src="../stylesheets/bootstrap.min.js"></script>
-		<script src="../stylesheets/ace-elements.min.js"></script>
-		<script src="../stylesheets/ace.min.js"></script>
-		<script src="../stylesheets/spin.min.js"></script>
-		<script src="../stylesheets/jquery.gritter.min.js"></script>
-		<script src="../stylesheets/jquery.easy-pie-chart.min.js"></script>
-		<script src="../stylesheets/bootbox.min.js"></script>
-		<script src="../stylesheets/jquery.ui.touch-punch.min.js"></script>
-		<script src="../stylesheets/jquery-ui-1.10.3.custom.min.js"></script>
-		<script src="../stylesheets/jquery-2.0.3.min.js"></script>
-		
 	</body>
 </html>
