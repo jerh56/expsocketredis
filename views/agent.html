@@ -83,7 +83,7 @@
 				console.log(username);
 				//$('#divbody').append('<div id ="box_conversation' + pos + '" style="float:left;width:600px;height:250px;overflow:auto;padding:10px;"> <div id="conversation'+pos +'"></div></div><div style="float:bottom"> <input id="data' + pos +'" style="width:600px;" /> <input type="button" id="datasend' + pos +'" value="enviar" /></div>');
 				$('#tabsmsj').append('<li><input type="radio" checked name="tabs" id="tab' + pos + '"><label id="tab-' + pos + '" for="tab' + pos + '">' + username + '</label></li>');
-				$('#divsmsj').append('<div id="tab-content'+pos+'" class="tab-content animated fadeIn"><div id ="box_conversation' + pos + '" style="float:left;width:600px;height:250px;overflow:auto;padding:10px;"><div id="conversation'+pos +'"></div></div><div style="float:bottom"> <input id="data' + pos +'" style="width:600px;" /><input type="button" id="datasend' + pos + '" value="enviar" /></div></div>');
+				$('#divsmsj').append('<div id="tab-content'+pos+'" class="tab-pane"><div id ="box_conversation' + pos + '" style="float:left;width:600px;height:250px;overflow:auto;padding:10px;"><div id="conversation'+pos +'"></div></div><div style="float:bottom"> <input id="data' + pos +'" style="width:600px;" /><input type="button" id="datasend' + pos + '" value="enviar" /></div></div>');
 				var script   = document.createElement("script");
 				script.type  = "text/javascript";
 				//script.src   = "/roomscript.js";    // use this for linked script
@@ -146,7 +146,7 @@
 		</div>
 		<ul id="tabsmsj" class="tabs">
 		</ul>
-		<div id="divsmsj">
+		<div id="divsmsj" class="tab-content">
 		</div>
 	</body>
 </html>
