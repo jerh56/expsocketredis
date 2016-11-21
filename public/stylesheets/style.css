@@ -37,7 +37,7 @@ body, html {
         margin: 75px auto;
       }
       .tabs li{
-        float: left;
+        /*float: left;*/
       }
       .tabs label {
           display: block;
@@ -82,8 +82,8 @@ body, html {
         padding: 15px;
         color: white;
         position: absolute;
-        top: 53px;
-        left: 0;
+        top: 0px;
+        left: 170px;
         box-sizing: border-box;
         -webkit-animation-duration: 0.5s;
         -o-animation-duration: 0.5s;
