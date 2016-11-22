@@ -237,16 +237,16 @@ io.sockets.on('connection', function (socket){
 
 
     // Este evento sucede cuando un nuevo usuario se conecto y lo va a atender un agente
-    socket.on('addagentroom', function(idroom,agentname,username,pos){
+    socket.on('addagentroom', function(idroom,agentname,username){
       if ((idroom != null)  && (idroom!="")){
         // Obtener numero de rooms que puede atender el agente
         // send client to room por default
         socket.join(idroom);
         // echo to client they've connected
-        socket.emit('updatechat', 'MENSAJERO RTC', 'Bienvenido: ' + agentname, pos, idroom);
+        socket.emit('updatechat', 'MENSAJERO RTC', 'Bienvenido: ' + agentname, idroom);
         // echo to room 1 that a person has connected to their room:
-        socket.broadcast.to(idroom).emit('updatechat', 'MENSAJERO RTC', 'Sala: ' + idroom, pos, idroom);
-        io.sockets.in(idroom).emit('updatechat', 'MENSAJERO RTC', 'Se conecto el usuario ' + username , pos, idroom);
+        socket.broadcast.to(idroom).emit('updatechat', 'MENSAJERO RTC', 'Sala: ' + idroom, idroom);
+        io.sockets.in(idroom).emit('updatechat', 'MENSAJERO RTC', 'Se conecto el usuario ' + username , idroom);
         socket.emit('updaterooms', agentnames, idroom);
         console.log('Se conecto el agente: ' + agentname);
       }
@@ -277,12 +277,12 @@ io.sockets.on('connection', function (socket){
     });
 
     // Cuando el agente emite un mensaje sendchatagent
-    socket.on('sendchatagent', function (data,roomname,pos){
-      io.sockets.in(roomname).emit('updatechat', socket.agentname, data,pos);
+    socket.on('sendchatagent', function (data,idroom){
+      io.sockets.in(idroom).emit('updatechat', socket.agentname, data, idroom);
       var newMsglist = new Msglist();
       newMsglist.username = socket.agentname;
       newMsglist.userid = socket.request.user._id;
-      newMsglist.room = roomname;
+      newMsglist.room = idroom;
       newMsglist.usertype = 'agent';
       newMsglist.message = data;
       newMsglist.date_msg = Date.now();

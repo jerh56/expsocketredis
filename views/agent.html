@@ -63,7 +63,7 @@
 				var script   = document.createElement("script");
 				script.type  = "text/javascript";
 				//script.src   = "/roomscript.js";    // use this for linked script
-				script.text  = "$('#datasend" + idroom +"').click( function() {var message = $('#data" + idroom +"').val();$('#data" + idroom +"').val('');$('#data" + idroom +"').focus();socket.emit('sendchatagent', message,'" + idroom + "', '" + idroom +"');});$('#data" + idroom +"').keypress(function(e) {if(e.which == 13) {$(this).blur();$('#datasend" + idroom +"').focus().click();}});"               // use this for inline script
+				script.text  = "$('#datasend" + idroom +"').click( function() {var message = $('#data" + idroom +"').val();$('#data" + idroom +"').val('');$('#data" + idroom +"').focus();socket.emit('sendchatagent', message,'" + idroom +"');});$('#data" + idroom +"').keypress(function(e) {if(e.which == 13) {$(this).blur();$('#datasend" + idroom +"').focus().click();}});"               // use this for inline script
 				document.body.appendChild(script);
 				console.log(username);
 				console.log(idroom);
