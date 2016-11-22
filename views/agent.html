@@ -21,74 +21,52 @@
 			});
 			// listener, whenever the server emits 'updatechat', this updates the chat body
 		  	//username de quien envia el mensaje
-			socket.on('updatechat', function (username, data,pos,roomid) {
-			    if (roomid == null) {
-			      pos = pos;
-			    }
-			      else{
-			      pos = roomid;
-			    }
-			    console.log(pos);
-			    console.log(roomid);
+			socket.on('updatechat', function (username, data,idroom) {
+			    
+			    console.log(idroom);
 			    console.log(username);
 			    console.log(data);
-			    var strTab =  $('#tab-' + pos).text();
+			    var strTab =  $('#tab-' + idroom ).text();
 			    if (strTab.lastIndexOf("esta escribiendo") >= 0){
-			       $('#tab-' + pos).text(  strTab.slice(0, strTab.lastIndexOf("esta escribiendo")-1)); // quita el mensaje de que el usuario esta escribiendo   
+			       $('#tab-' + idroom).text(  strTab.slice(0, strTab.lastIndexOf("esta escribiendo")-1)); // quita el mensaje de que el usuario esta escribiendo   
 			    } 
 				if (username === agentname){
-				   $('#conversation' + pos).append('<p class="triangle-isosceles"> <b>'+username + ':</b> ' + data + '</p>');
+				   $('#conversation' + idroom).append('<p class="triangle-isosceles"> <b>'+username + ':</b> ' + data + '</p>');
 		      	}
 			    else{
-			    	$('#conversation' + pos).append('<p class="triangle-isosceles top"> <b>'+ '>>' + username + ':</b> ' + data + '</p>');
+			    	$('#conversation' + idroom).append('<p class="triangle-isosceles top"> <b>'+ '>>' + username + ':</b> ' + data + '</p>');
 		        
 				} 
 				//Getting the element's new height now
 				//alert(data + '  ' + pos);
-			    var sHeight = $('#conversation' + pos)[0].scrollHeight;
+			    var sHeight = $('#conversation' + idroom )[0].scrollHeight;
 			    //Scrolling the element to the sHeight
-			    $('#box_conversation' + pos).scrollTop(sHeight);
-			    console.log(pos);
+			    $('#box_conversation' + idroom).scrollTop(sHeight);
+			    console.log(idroom);
 			    console.log(username);
 			    console.log(data);
 			    console.log(sHeight);
 			});
-			socket.on('istyping', function (username, data,pos,roomid) {
-			    //alert('sfsefsdf');
-			    if (roomid == null) {
-			      pos = pos;
-			    }
-			      else{
-			      pos = roomid;
-			    }
-			    console.log(pos);
-			    console.log(roomid);
+			socket.on('istyping', function (username, data,idroom) {
+			   
+			    console.log(idroom);
 			    console.log(username);
 			    console.log(data);
 			    console.log('escribiendo');
-			    $('#tab-' + pos).text( username + ' esta escribiendo...');
-			      // settimetodrop(username,pos);        
+			    $('#tab-' + idroom).text( username + ' esta escribiendo...');       
 		  	});
-		   	socket.on('newuser', function (emisor, username, roomid,pos) {
-				socket.emit('addagentroom', roomid, agentname,username, pos);
-				if (roomid == null) {
-				 pos = pos;
-				}
-				else{
-				 pos = roomid;
-				}
-				console.log(pos);
-				console.log(roomid);
+		   	socket.on('newuser', function (emisor, username, idroom) {
+				socket.emit('addagentroom', idroom, agentname,username);
+				console.log(idroom);
 				console.log(username);
-				//$('#divbody').append('<div id ="box_conversation' + pos + '" style="float:left;width:600px;height:250px;overflow:auto;padding:10px;"> <div id="conversation'+pos +'"></div></div><div style="float:bottom"> <input id="data' + pos +'" style="width:600px;" /> <input type="button" id="datasend' + pos +'" value="enviar" /></div>');
-				$('#tabsmsj').append('<li><input type="radio" checked name="tabs" id="tab'+pos+'"><label id="tab-' + pos + '" for="tab'+pos+'">' + username +'</label><div id="tab-content'+pos+'" class="tab-content animated fadeIn"> <div id ="box_conversation' + pos + '" style="float:left;width:600px;height:250px;overflow:auto;padding:10px;"> <div id="conversation'+pos +'"></div></div><div style="float:bottom"> <input id="data' + pos +'" style="width:600px;" /> <input type="button" id="datasend' + pos +'" value="enviar" /></div></div></li>');
+				$('#tabsmsj').append('<li><input type="radio" checked name="tabs" id="tab'+idroom+'"><label id="tab-' + idroom + '" for="tab'+idroom+'">' + username +'</label><div id="tab-content'+idroom+'" class="tab-content animated fadeIn"> <div id ="box_conversation' + idroom + '" style="float:left;width:600px;height:250px;overflow:auto;padding:10px;"> <div id="conversation'+idroom +'"></div></div><div style="float:bottom"> <input id="data' + idroom +'" style="width:600px;" /> <input type="button" id="datasend' + idroom +'" value="enviar" /></div></div></li>');
 				var script   = document.createElement("script");
 				script.type  = "text/javascript";
 				//script.src   = "/roomscript.js";    // use this for linked script
-				script.text  = "$('#datasend" + pos +"').click( function() {var message = $('#data" + pos +"').val();$('#data" + pos +"').val('');$('#data" + pos +"').focus();socket.emit('sendchatagent', message,'" + roomid + "', '" + pos +"');});$('#data" + pos +"').keypress(function(e) {if(e.which == 13) {$(this).blur();$('#datasend" + pos +"').focus().click();}});"               // use this for inline script
+				script.text  = "$('#datasend" + idroom +"').click( function() {var message = $('#data" + idroom +"').val();$('#data" + idroom +"').val('');$('#data" + idroom +"').focus();socket.emit('sendchatagent', message,'" + idroom + "', '" + idroom +"');});$('#data" + idroom +"').keypress(function(e) {if(e.which == 13) {$(this).blur();$('#datasend" + idroom +"').focus().click();}});"               // use this for inline script
 				document.body.appendChild(script);
 				console.log(username);
-				console.log(roomid);
+				console.log(idroom);
 			});
 			// listener, whenever the server emits 'updaterooms', this updates the room the client is in
 			socket.on('updaterooms', function(rooms, current_room) {

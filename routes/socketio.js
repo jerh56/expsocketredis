@@ -22,7 +22,6 @@ var currentroom ="";
 setInterval(function(){
   //console.log('test');
   var agentroom = '0';
-  var posRoom = '';
   Userlist.count({},function(err,nCount){
       //console.log('Conteo: ' + nCount);
       if ( nCount > 0 ){
@@ -32,7 +31,6 @@ setInterval(function(){
            if (agentnames[agentname].cantidad < 3 ){
              agentnames[agentname].cantidad = agentnames[agentname].cantidad + 1;
              console.log(agentnames[agentname].cantidad);
-             posRoom = ("0" + agentnames[agentname].cantidad).slice(-2);
              agentroom = agentnames[agentname].idroom;
              var waitforagent = false;
              var username ='';
@@ -53,8 +51,8 @@ setInterval(function(){
                     username = doc.nombre;
                     currentroom = doc.idroom;
                     io.sockets.in(currentroom).emit('updatechat', 'MENSAJERO RTC', 'Hay agente disponible ');
-                    io.sockets.in(agentroom).emit('newuser', 'MENSAJERO RTC',username, currentroom, posRoom);
-                    io.sockets.in(currentroom).emit('updatechat', 'MENSAJERO RTC','Te esta atendiendo ' + agentnames[agentname].nombre, posRoom,currentroom);
+                    io.sockets.in(agentroom).emit('newuser', 'MENSAJERO RTC',username, currentroom);
+                    io.sockets.in(currentroom).emit('updatechat', 'MENSAJERO RTC','Te esta atendiendo ' + agentnames[agentname].nombre,currentroom);
                     //userlist.splice(posusername,1);
 
                     doc.remove({ _id: doc._id }, function(err) {
@@ -86,7 +84,6 @@ io.sockets.on('connection', function (socket){
     
     // cuando un usuario se conecta se produce este evento
     socket.on('adduser', function(username){
-      socket.posRoom ='';     
       if ((username != null)  && (username !="")){
         // store the username in the socket session for this client
         socket.username = username;
@@ -104,7 +101,6 @@ io.sockets.on('connection', function (socket){
           if (agentnames[agentname].cantidad < 3 ){
             agentnames[agentname].cantidad = agentnames[agentname].cantidad + 1;
             console.log(agentnames[agentname].cantidad);
-            socket.posRoom = ("0" + agentnames[agentname].cantidad).slice(-2);
             agentroom = agentnames[agentname].idroom;
             waitforagent = false;
             break;
@@ -183,12 +179,10 @@ io.sockets.on('connection', function (socket){
           // send client to room 1
           socket.join(currentroom);
           // eco al room del agente
-          //socket.broadcast.to(agentna).emit('newuser', 'MENSAJERO RTC',username, currentroom, socket.posRoom);
-          // eco al room del agente
-          socket.broadcast.to(agentroom).emit('newuser', 'MENSAJERO RTC',username, currentroom, socket.posRoom);
+          socket.broadcast.to(agentroom).emit('newuser', 'MENSAJERO RTC',username, currentroom);
           // echo to client they've connected
           //El evento updatechat envia usuario que emite, Datos, Posicion (se descontinuara), ID del room (solo en caso de que el mensaje vaya para un usuario y no un agente)
-          socket.emit('updatechat', 'MENSAJERO RTC', 'Te esta atendiendo ' + currentroom, socket.posRoom, currentroom);
+          socket.emit('updatechat', 'MENSAJERO RTC', 'Te esta atendiendo ' + currentroom, currentroom);
           // echo to room 1 that a person has connected to their room
           socket.broadcast.to(agentroom).emit('updatechat', 'MENSAJERO RTC', username + ' se ha conectado a ' + currentroom, '');
           socket.emit('updaterooms', agentnames, agentroom);
@@ -261,11 +255,10 @@ io.sockets.on('connection', function (socket){
     // when the client emits 'sendchat', this listens and executes
     socket.on('sendchat', function (data) {
       // we tell the client to execute 'updatechat' with 2 parameters
-      io.sockets.in(socket.room).emit('updatechat', socket.username, data,socket.posRoom, socket.room);
+      io.sockets.in(socket.room).emit('updatechat', socket.username, data, socket.room);
       var newMsglist = new Msglist();
       newMsglist.username = socket.username;
       newMsglist.userid = socket.request.user._id;
-      newMsglist.posroom = socket.posRoom;
       newMsglist.room = socket.room;
       newMsglist.usertype = 'user';
       newMsglist.message = data;
@@ -289,7 +282,6 @@ io.sockets.on('connection', function (socket){
       var newMsglist = new Msglist();
       newMsglist.username = socket.agentname;
       newMsglist.userid = socket.request.user._id;
-      newMsglist.posroom = pos;
       newMsglist.room = roomname;
       newMsglist.usertype = 'agent';
       newMsglist.message = data;
@@ -340,7 +332,7 @@ io.sockets.on('connection', function (socket){
                       io.sockets.emit('updateusers', rUsernames);
                       // echo globally that this client has left
                       // preguntar si es usuario para avisar al agente que se desconecto
-                      io.sockets.in(socket.room).emit('updatechat', 'MENSAJERO RTC', "Se desconecto el usuario " + socket.username, socket.posRoom,socket.room);
+                      io.sockets.in(socket.room).emit('updatechat', 'MENSAJERO RTC', "Se desconecto el usuario " + socket.username,socket.room);
                       console.log("Se desconecto el usuario " + socket.username)
                       socket.broadcast.emit('updatechat', 'MENSAJERO RTC', socket.username + ' se ha desconectado');
                       socket.leave(socket.room);
@@ -377,7 +369,6 @@ io.sockets.on('connection', function (socket){
             // update list of users in chat, client-side
             io.sockets.emit('updateusers', usernames);
             // echo globally that this client has left
-            //io.sockets.in(socket.room).emit('updatechat', 'MENSAJERO RTC', "Se desconecto el agente " + socket.agentname, socket.posRoom);
             socket.broadcast.emit('updatechat', 'MENSAJERO RTC', socket.agentname + ' se ha desconectado');
             socket.emit('updaterooms', agentnames, socket.agentname);
             // falta modificar esta linea
@@ -389,7 +380,7 @@ io.sockets.on('connection', function (socket){
     });
 
     socket.on('typing', function(data){
-      io.sockets.in(socket.room).emit('istyping', socket.username, data,socket.posRoom, socket.room);
+      io.sockets.in(socket.room).emit('istyping', socket.username, data, socket.room);
       console.log(socket.id + 'is typing');
     });
   });
