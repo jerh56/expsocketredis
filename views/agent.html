@@ -16,7 +16,7 @@
 			// call the server-side function 'adduser' and send one parameter (value of prompt)
 		    //agentname = prompt("Cual es tu nombre de Agente?")
 		    	  agentname = '<%= agentname %>';
-				  socket.emit('addagent', agentname);
+				  socket.emit('connectagent', agentname);
 				  socket.agentname = agentname;
 			});
 			// listener, whenever the server emits 'updatechat', this updates the chat body

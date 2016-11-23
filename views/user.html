@@ -14,7 +14,7 @@
 					// call the server-side function 'adduser' and send one parameter (value of prompt)
 					//localusername = prompt("Cual es tu nombre de usuario?");
 					localusername = '<%= username %>'
-					socket.emit('adduser', localusername);
+					socket.emit('connectuser', localusername);
 					socket.localusername = localusername;
 				});
 				socket.on('reconnecting', function(){

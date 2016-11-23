@@ -4,4 +4,4 @@ var userSchema = mongoose.Schema({
     idroom: String
 });
 
-module.exports = mongoose.model('userlist', userSchema);
+module.exports = mongoose.model('waitlist', userSchema);
