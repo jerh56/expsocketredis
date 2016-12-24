@@ -5,7 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-
+ 
 
 // FLASH
 var flash = require('connect-flash'); // middleware para mensajes en passport
